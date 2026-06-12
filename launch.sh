@@ -24,6 +24,16 @@ UUID="${UUID:-00000000-0000-0000-0000-000000000000}"
 ACCESS_TOKEN="${ACCESS_TOKEN:-0}"
 USER_TYPE="${USER_TYPE:-legacy}"
 
+if { exec 3</dev/tty; } 2>/dev/null; then
+  :
+elif [ -t 0 ]; then
+  exec 3<&0
+else
+  echo "InlineMC needs an interactive terminal for username/version prompts." >&2
+  echo "Run this command from a terminal, or download launch.sh and run it directly." >&2
+  exit 1
+fi
+
 read_cached_value() {
   local file="$1"
   local value=""
@@ -45,13 +55,13 @@ prompt_value() {
 
   while [ -z "$value" ]; do
     if [ -n "$cached" ]; then
-      read -r -p "$label [$cached]: " input
+      read -r -p "$label [$cached]: " input <&3
       value="${input:-$cached}"
     elif [ -n "$fallback" ]; then
-      read -r -p "$label [$fallback]: " input
+      read -r -p "$label [$fallback]: " input <&3
       value="${input:-$fallback}"
     else
-      read -r -p "$label: " input
+      read -r -p "$label: " input <&3
       value="$input"
     fi
 

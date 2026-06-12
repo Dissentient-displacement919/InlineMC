@@ -2,3 +2,4 @@ logs/
 server/cache
 server/node_modules
 server/logs/
+server/stats.json
