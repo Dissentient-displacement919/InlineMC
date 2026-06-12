@@ -1,0 +1,288 @@
+:root {
+  color-scheme: dark;
+  --bg: #0b0d10;
+  --panel: #11151a;
+  --panel-soft: #151a20;
+  --text: #f3f5f7;
+  --muted: #8e98a5;
+  --line: #242b34;
+  --accent: #7ee787;
+  --accent-soft: #18271d;
+  --code: #080b0d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+
+main {
+  width: min(1040px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 72px 0 84px;
+}
+
+.hero {
+  min-height: 58vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px 0 56px;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  letter-spacing: 0;
+  line-height: 1.05;
+}
+
+h1 {
+  max-width: 8ch;
+  font-size: clamp(4rem, 11vw, 8.5rem);
+}
+
+h2 {
+  font-size: clamp(2rem, 5vw, 4rem);
+}
+
+h3 {
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.lede {
+  max-width: 700px;
+  margin: 22px 0 14px;
+  color: var(--muted);
+  font-size: clamp(1.06rem, 2vw, 1.28rem);
+}
+
+.repo-link {
+  margin: 0 0 30px;
+}
+
+.repo-link a {
+  color: var(--accent);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.repo-link a:hover {
+  text-decoration: underline;
+}
+
+.install-box {
+  max-width: 880px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  border-bottom: 1px solid var(--line);
+  background: #0d1115;
+}
+
+.tab {
+  min-width: 96px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 800;
+  padding: 9px 12px;
+}
+
+.tab.is-active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.command-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+}
+
+.command-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+code {
+  display: block;
+  overflow-x: auto;
+  min-width: 0;
+  color: var(--accent);
+  background: var(--code);
+  border: 1px solid #172018;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.download-script {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.download-script a {
+  color: var(--accent);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.download-script a:hover {
+  text-decoration: underline;
+}
+
+.copy-button {
+  min-width: 86px;
+  align-self: end;
+  border: 1px solid var(--line);
+  background: var(--text);
+  border-radius: 6px;
+  color: var(--bg);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 800;
+  padding: 10px 12px;
+}
+
+.copy-button:active {
+  transform: translateY(1px);
+}
+
+.stats {
+  padding-top: 44px;
+  border-top: 1px solid var(--line);
+}
+
+.section-heading {
+  margin-bottom: 22px;
+}
+
+.summary-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 34px;
+}
+
+.summary-pill {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 999px;
+  padding: 8px 12px;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.summary-pill strong {
+  color: var(--text);
+  font-weight: 800;
+}
+
+.stats-group {
+  margin-top: 30px;
+}
+
+.group-heading {
+  margin-bottom: 12px;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.stat {
+  min-height: 112px;
+  border: 1px solid var(--line);
+  background: var(--panel-soft);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.stat span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.stat strong {
+  display: block;
+  margin-top: 18px;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.empty {
+  grid-column: 1 / -1;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 8px;
+  padding: 18px;
+  color: var(--muted);
+}
+
+@media (max-width: 640px) {
+  main {
+    width: min(100% - 28px, 1040px);
+    padding-top: 44px;
+  }
+
+  .hero {
+    min-height: auto;
+    padding-bottom: 42px;
+  }
+
+  h1 {
+    font-size: 4rem;
+  }
+
+  .command-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .copy-button {
+    width: 100%;
+  }
+}

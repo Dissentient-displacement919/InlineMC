@@ -1,0 +1,8 @@
+.git
+.agents
+.codex
+logs
+server/cache
+server/logs
+server/node_modules
+npm-debug.log

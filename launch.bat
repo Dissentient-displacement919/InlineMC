@@ -3,7 +3,13 @@ setlocal EnableExtensions EnableDelayedExpansion
 
 rem Minimal local-first Minecraft launcher.
 
-set API=http://localhost:3000/v1/plan.txt
+if not defined API (
+    if "%DEBUG%"=="1" (
+        set "API=http://localhost:3000/v1/plan.txt"
+    ) else (
+        set "API=https://inlinemc.sammwy.com/v1/plan.txt"
+    )
+)
 
 set "MC_HOME=%APPDATA%\.minecraft"
 set "CACHE_DIR=%MC_HOME%\cache"

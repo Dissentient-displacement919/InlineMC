@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>InlineMC</title>
+    <meta name="description" content="A minimal local-first Minecraft launcher and resolver.">
+    <link rel="stylesheet" href="/style.css">
+    <script src="/app.js"></script>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <p class="eyebrow">No launcher required</p>
+        <h1>InlineMC</h1>
+        <p class="lede">
+          Launch Minecraft from one command. InlineMC downloads what vanilla needs, reuses your normal Minecraft folder, and gets you straight to the game.
+        </p>
+        <p class="repo-link">
+          <a href="https://github.com/sammwyy/inlinemc" rel="noreferrer" target="_blank">github.com/sammwyy/inlinemc</a>
+        </p>
+
+        <div class="install-box" aria-label="Run command">
+          <div class="tabs" role="tablist" aria-label="Operating system">
+            <button class="tab" id="tab-linux" type="button" role="tab" aria-controls="command-panel" data-os="linux">Linux</button>
+            <button class="tab" id="tab-windows-powershell" type="button" role="tab" aria-controls="command-panel" data-os="windows-powershell">Windows PowerShell</button>
+            <button class="tab" id="tab-windows-cmd" type="button" role="tab" aria-controls="command-panel" data-os="windows-cmd">Windows CMD</button>
+          </div>
+
+          <div class="command-panel" id="command-panel" role="tabpanel">
+            <div>
+              <span class="command-label" id="command-label"></span>
+              <code id="install-command"></code>
+              <p class="download-script">
+                Or download the script:
+                <a id="script-download" href="#" download></a>
+              </p>
+            </div>
+            <button class="copy-button" id="copy-command" type="button">Copy</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="stats" aria-labelledby="stats-title">
+        <div class="section-heading">
+          <p class="eyebrow">Resolver activity</p>
+          <h2 id="stats-title">Launch Stats</h2>
+        </div>
+
+        <div class="summary-line" id="stats-summary" aria-live="polite"></div>
+
+        <div class="stats-group" aria-labelledby="last24-title">
+          <div class="group-heading">
+            <h3 id="last24-title">Last 24 hours</h3>
+          </div>
+          <div class="stat-grid" id="stats-last24h"></div>
+        </div>
+
+        <div class="stats-group" aria-labelledby="alltime-title">
+          <div class="group-heading">
+            <h3 id="alltime-title">All time</h3>
+          </div>
+          <div class="stat-grid" id="stats-alltime"></div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      populateStats({raw_stats});
+    </script>
+  </body>
+</html>

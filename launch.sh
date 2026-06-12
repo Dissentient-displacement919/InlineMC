@@ -3,7 +3,13 @@ set -euo pipefail
 
 # Minimal local-first Minecraft launcher.
 
-API="${API:-http://localhost:3000/v1/plan.txt}"
+DEFAULT_API="https://inlinemc.sammwy.com/v1/plan.txt"
+
+if [ "${DEBUG:-0}" = "1" ]; then
+  DEFAULT_API="http://localhost:3000/v1/plan.txt"
+fi
+
+API="${API:-$DEFAULT_API}"
 
 MC_HOME="${MC_HOME:-$HOME/.minecraft}"
 CACHE_DIR="${CACHE_DIR:-$MC_HOME/cache}"

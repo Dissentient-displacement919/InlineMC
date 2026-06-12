@@ -7,7 +7,13 @@ const app = express();
 
 const PORT = Number(process.env.PORT || 3000);
 const CACHE_DIR = path.resolve("./cache");
+const PUBLIC_DIR = path.resolve("./public");
+const INDEX_FILE = path.join(PUBLIC_DIR, "index.html");
 const PLAN_CACHE_VERSION = "rules-v2";
+const STATS_FILE = path.resolve("./stats.json");
+const PLAN_LOG_FILE = path.resolve("./logs/plan-resolves.log");
+const LAST_24H_MS = 24 * 60 * 60 * 1000;
+const STATS_FLUSH_INTERVAL_MS = 1000;
 
 const MANIFEST_URL =
   "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
@@ -51,6 +57,148 @@ async function writeJsonCache(file, data) {
   await ensureDir(file);
   await fs.writeFile(file, JSON.stringify(data, null, 2));
 }
+
+function emptyStats(timestamp = new Date().toISOString()) {
+  return {
+    plan: {
+      allTime: {},
+      last24h: {
+        _timestamp: timestamp
+      }
+    }
+  };
+}
+
+async function readStats(timestamp) {
+  const stats = await readJsonCache(STATS_FILE);
+
+  if (!stats || typeof stats !== "object") {
+    return emptyStats(timestamp);
+  }
+
+  if (!stats.plan || typeof stats.plan !== "object") {
+    stats.plan = {};
+  }
+
+  if (!stats.plan.allTime || typeof stats.plan.allTime !== "object") {
+    stats.plan.allTime = {};
+  }
+
+  if (!stats.plan.last24h || typeof stats.plan.last24h !== "object") {
+    stats.plan.last24h = { _timestamp: timestamp };
+  }
+
+  if (!stats.plan.last24h._timestamp) {
+    stats.plan.last24h._timestamp = timestamp;
+  }
+
+  return stats;
+}
+
+function incrementCount(bucket, version) {
+  bucket[version] = Number(bucket[version] || 0) + 1;
+}
+
+function renderStatsTemplate(html) {
+  const rawStats = JSON.stringify(stats).replace(/</g, "\\u003c");
+  return html.replaceAll("{raw_stats}", rawStats);
+}
+
+function planVersionFromText(plan, fallback) {
+  const versionLine = plan
+    .split("\n")
+    .find((line) => line.startsWith("VERSION|"));
+
+  if (!versionLine) return fallback;
+
+  const [, version] = versionLine.split("|");
+  return version || fallback;
+}
+
+let stats = await readStats(new Date().toISOString());
+const indexHtmlTemplate = await fs.readFile(INDEX_FILE, "utf8");
+let statsDirty = false;
+let statsFlushInProgress = false;
+let pendingPlanLogLines = [];
+
+async function flushStatsIfDirty() {
+  if (statsFlushInProgress) return;
+  if (!statsDirty && pendingPlanLogLines.length === 0) return;
+
+  statsFlushInProgress = true;
+
+  const shouldWriteStats = statsDirty;
+  const statsPayload = shouldWriteStats
+    ? JSON.stringify(stats, null, 2) + "\n"
+    : null;
+  const logLines = pendingPlanLogLines;
+  const logPayload = logLines.join("");
+
+  statsDirty = false;
+  pendingPlanLogLines = [];
+
+  try {
+    const writes = [];
+
+    if (statsPayload !== null) {
+      await ensureDir(STATS_FILE);
+      writes.push(fs.writeFile(STATS_FILE, statsPayload));
+    }
+
+    if (logPayload) {
+      await ensureDir(PLAN_LOG_FILE);
+      writes.push(fs.appendFile(PLAN_LOG_FILE, logPayload));
+    }
+
+    await Promise.all(writes);
+  } catch (err) {
+    if (shouldWriteStats) {
+      statsDirty = true;
+    }
+
+    if (logLines.length > 0) {
+      pendingPlanLogLines = logLines.concat(pendingPlanLogLines);
+    }
+
+    console.error(`Failed to flush plan stats: ${err.stack || err}`);
+  } finally {
+    statsFlushInProgress = false;
+  }
+}
+
+setInterval(() => {
+  flushStatsIfDirty().catch((err) => {
+    console.error(`Failed to flush plan stats: ${err.stack || err}`);
+  });
+}, STATS_FLUSH_INTERVAL_MS);
+
+function recordPlanResolve({ version, requestedVersion, osName, arch, cacheHit }) {
+  const timestamp = new Date().toISOString();
+  const cacheStatus = cacheHit ? "hit" : "miss";
+  const message =
+    `[${timestamp}] plan resolved version=${version} ` +
+    `requested=${requestedVersion} os=${osName} arch=${arch} cache=${cacheStatus}`;
+
+  console.log(message);
+
+  const windowStart = Date.parse(stats.plan.last24h._timestamp);
+
+  if (!Number.isFinite(windowStart) || Date.now() - windowStart >= LAST_24H_MS) {
+    stats.plan.last24h = { _timestamp: timestamp };
+  }
+
+  incrementCount(stats.plan.allTime, version);
+  incrementCount(stats.plan.last24h, version);
+
+  pendingPlanLogLines.push(`${message}\n`);
+  statsDirty = true;
+}
+
+app.get("/", (_req, res) => {
+  res.type("html").send(renderStatsTemplate(indexHtmlTemplate));
+});
+
+app.use(express.static(PUBLIC_DIR, { index: false }));
 
 async function fetchJsonCached(file, url) {
   const cached = await readJsonCache(file);
@@ -318,23 +466,34 @@ async function buildPlan({ version, osName, arch }) {
 
 app.get("/v1/plan.txt", async (req, res) => {
   try {
-    const version = String(req.query.version || "latest-release");
+    const requestedVersion = String(req.query.version || "latest-release");
     const osName = normalizeOs(req.query.os);
     const arch = normalizeArch(req.query.arch);
 
-    const planKey = `${PLAN_CACHE_VERSION}_${version}_${osName}_${arch}`;
+    const planKey = `${PLAN_CACHE_VERSION}_${requestedVersion}_${osName}_${arch}`;
     const planHash = sha1Text(planKey).slice(0, 12);
     const planFile = cachePath("plans", `${planKey}_${planHash}.txt`);
 
     let plan;
+    let cacheHit = true;
 
     try {
       plan = await fs.readFile(planFile, "utf8");
     } catch {
-      plan = await buildPlan({ version, osName, arch });
+      cacheHit = false;
+      plan = await buildPlan({ version: requestedVersion, osName, arch });
       await ensureDir(planFile);
       await fs.writeFile(planFile, plan);
     }
+
+    const resolvedVersion = planVersionFromText(plan, requestedVersion);
+    recordPlanResolve({
+      version: resolvedVersion,
+      requestedVersion,
+      osName,
+      arch,
+      cacheHit
+    });
 
     res.type("text/plain").send(plan);
   } catch (err) {
