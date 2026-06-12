@@ -124,6 +124,7 @@ JVM_ARGS=()
 GAME_ARGS=()
 NATIVES_DIR="$MC_HOME/versions/$VERSION/natives"
 SKIP_NEXT_GAME_ARG=0
+normalized_path=""
 
 verify_sha1() {
   local file="$1"
@@ -135,6 +136,21 @@ verify_sha1() {
   actual="$(sha1sum "$file" | awk '{print $1}')"
 
   [ "$actual" = "$expected" ]
+}
+
+normalize_rel_path() {
+  local kind="$1"
+  local rel_path="$2"
+
+  case "$kind" in
+    LIBRARY|NATIVE|CLASSPATH)
+      if [[ "$rel_path" != libraries/* ]]; then
+        rel_path="libraries/$rel_path"
+      fi
+      ;;
+  esac
+
+  printf '%s' "$rel_path"
 }
 
 download_file() {
@@ -216,19 +232,21 @@ while IFS='|' read -r kind p1 p2 p3 p4 p5 rest; do
       ;;
 
     CLIENT|LIBRARY|ASSET_INDEX|ASSET)
-      download_file "$p1" "$p2" "$p3"
+      download_file "$(normalize_rel_path "$kind" "$p1")" "$p2" "$p3"
       ;;
 
     NATIVE)
-      download_file "$p1" "$p2" "$p3"
-      extract_native "$p1" "$p5"
+      normalized_path="$(normalize_rel_path "$kind" "$p1")"
+      download_file "$normalized_path" "$p2" "$p3"
+      extract_native "$normalized_path" "$p5"
       ;;
 
     CLASSPATH)
+      normalized_path="$(normalize_rel_path "$kind" "$p1")"
       if [ -z "$CLASSPATH" ]; then
-        CLASSPATH="$MC_HOME/$p1"
+        CLASSPATH="$MC_HOME/$normalized_path"
       else
-        CLASSPATH="$CLASSPATH:$MC_HOME/$p1"
+        CLASSPATH="$CLASSPATH:$MC_HOME/$normalized_path"
       fi
       ;;
 

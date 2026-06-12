@@ -82,12 +82,14 @@ for /f "usebackq tokens=1-6 delims=|" %%A in ("%PLAN_FILE%") do (
     )
 
     if "!KIND!"=="LIBRARY" (
-        call :download "!P1!" "!P2!" "!P3!"
+        call :normalize_rel_path "!KIND!" "!P1!"
+        call :download "!NORMALIZED_PATH!" "!P2!" "!P3!"
     )
 
     if "!KIND!"=="NATIVE" (
-        call :download "!P1!" "!P2!" "!P3!"
-        call :extract_native "!P1!" "!P5!"
+        call :normalize_rel_path "!KIND!" "!P1!"
+        call :download "!NORMALIZED_PATH!" "!P2!" "!P3!"
+        call :extract_native "!NORMALIZED_PATH!" "!P5!"
     )
 
     if "!KIND!"=="ASSET_INDEX" (
@@ -99,10 +101,11 @@ for /f "usebackq tokens=1-6 delims=|" %%A in ("%PLAN_FILE%") do (
     )
 
     if "!KIND!"=="CLASSPATH" (
+        call :normalize_rel_path "!KIND!" "!P1!"
         if defined CLASSPATH (
-            set CLASSPATH=!CLASSPATH!;%MC_HOME%\!P1!
+            set CLASSPATH=!CLASSPATH!;%MC_HOME%\!NORMALIZED_PATH!
         ) else (
-            set CLASSPATH=%MC_HOME%\!P1!
+            set CLASSPATH=%MC_HOME%\!NORMALIZED_PATH!
         )
     )
 
@@ -205,6 +208,21 @@ if not "!ERRORLEVEL!"=="0" (
     exit /b 1
 )
 
+exit /b 0
+
+:normalize_rel_path
+set NORMALIZED_KIND=%~1
+set NORMALIZED_PATH=%~2
+
+if "%NORMALIZED_KIND%"=="LIBRARY" goto :normalize_library_path
+if "%NORMALIZED_KIND%"=="NATIVE" goto :normalize_library_path
+if "%NORMALIZED_KIND%"=="CLASSPATH" goto :normalize_library_path
+
+exit /b 0
+
+:normalize_library_path
+if /I "%NORMALIZED_PATH:~0,10%"=="libraries/" exit /b 0
+set NORMALIZED_PATH=libraries/%NORMALIZED_PATH%
 exit /b 0
 
 :verify

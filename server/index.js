@@ -9,7 +9,7 @@ const PORT = Number(process.env.PORT || 3000);
 const CACHE_DIR = path.resolve("./cache");
 const PUBLIC_DIR = path.resolve("./public");
 const INDEX_FILE = path.join(PUBLIC_DIR, "index.html");
-const PLAN_CACHE_VERSION = "rules-v2";
+const PLAN_CACHE_VERSION = "rules-v3";
 const STATS_FILE = path.resolve("./stats.json");
 const PLAN_LOG_FILE = path.resolve("./logs/plan-resolves.log");
 const LAST_24H_MS = 24 * 60 * 60 * 1000;
@@ -304,6 +304,14 @@ function resolveLibraryArtifact(lib, osName, arch) {
   return result;
 }
 
+function libraryPath(pathValue) {
+  if (!pathValue || pathValue.startsWith("libraries/")) {
+    return pathValue;
+  }
+
+  return `libraries/${pathValue}`;
+}
+
 function safeLine(parts) {
   return parts.map((p) => String(p ?? "").replace(/\r?\n/g, "")).join("|");
 }
@@ -383,12 +391,13 @@ async function buildPlan({ version, osName, arch }) {
     if (!resolved) continue;
 
     if (resolved.artifact) {
-      classpath.push(resolved.artifact.path);
+      const artifactPath = libraryPath(resolved.artifact.path);
+      classpath.push(artifactPath);
 
       lines.push(
         safeLine([
           "LIBRARY",
-          resolved.artifact.path,
+          artifactPath,
           resolved.artifact.sha1 || "",
           resolved.artifact.url,
           String(resolved.artifact.size || "")
@@ -397,10 +406,11 @@ async function buildPlan({ version, osName, arch }) {
     }
 
     if (resolved.native) {
+      const nativePath = libraryPath(resolved.native.path);
       lines.push(
         safeLine([
           "NATIVE",
-          resolved.native.path,
+          nativePath,
           resolved.native.sha1 || "",
           resolved.native.url,
           String(resolved.native.size || ""),

@@ -102,6 +102,19 @@ function Download-File {
   }
 }
 
+function Normalize-RelPath {
+  param(
+    [string] $Kind,
+    [string] $RelPath
+  )
+
+  if ($Kind -in @("LIBRARY", "NATIVE", "CLASSPATH") -and -not $RelPath.StartsWith("libraries/")) {
+    return "libraries/$RelPath"
+  }
+
+  return $RelPath
+}
+
 function Expand-Native {
   param(
     [string] $RelPath,
@@ -199,14 +212,17 @@ foreach ($Line in Get-Content -LiteralPath $PlanFile) {
       $script:AssetIndexId = $P1
     }
     { $_ -in @("CLIENT", "LIBRARY", "ASSET_INDEX", "ASSET") } {
-      Download-File -RelPath $P1 -Sha1 $P2 -Url $P3
+      $RelPath = Normalize-RelPath -Kind $Kind -RelPath $P1
+      Download-File -RelPath $RelPath -Sha1 $P2 -Url $P3
     }
     "NATIVE" {
-      Download-File -RelPath $P1 -Sha1 $P2 -Url $P3
-      Expand-Native -RelPath $P1 -ExtractRel $P5
+      $RelPath = Normalize-RelPath -Kind $Kind -RelPath $P1
+      Download-File -RelPath $RelPath -Sha1 $P2 -Url $P3
+      Expand-Native -RelPath $RelPath -ExtractRel $P5
     }
     "CLASSPATH" {
-      $Entry = Join-Path $McHome $P1
+      $RelPath = Normalize-RelPath -Kind $Kind -RelPath $P1
+      $Entry = Join-Path $McHome $RelPath
       if ($script:Classpath) {
         $script:Classpath = "$script:Classpath;$Entry"
       } else {
